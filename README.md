@@ -1,6 +1,6 @@
 # yfinance Package with Wide-Form Data Support and Data Export
 
-`yfinance-extended` extends `yfinance` package and make it easier to:
+`yfinance-extended` extends `yfinance` package by Ran Aroussi and make it easier to:
 1. Retrieve multiple-ticker intraday price data in a wide-form `pandas` dataframe;
 2. Read options data for all available expiration dates;
 3. Retrieve top-of-the-book bid-ask prices and sizes; and,

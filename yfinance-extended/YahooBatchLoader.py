@@ -6,6 +6,7 @@ import pandas as pd
 import datetime
 from . import utils
 from . import quote
+from . import files
 
 
 class YahooBatchLoader:
@@ -94,3 +95,24 @@ class YahooBatchLoader:
 
         return options_df
 
+    def update_data(self, tickers: yf.Ticker | yf.Tickers | str | list[str],
+                    root_dir: str,
+                    start: Any = None,
+                    end: Any = None,
+                    period: str = "5d"):
+
+        # Get period into start/end dates
+        if start == None and end == None:
+            end = datetime.date.today()
+            if period in ["1d", "5d"]:
+                start = end - datetime.timedelta(days=period[:-1])
+            elif period in ["1mo", "3mo", "6mo"]:
+                start = end - datetime.timedelta(months=period[:-1])
+            elif period in ["1y", "2y", "5y", "10y"]:
+                start = end - datetime.timedelta(months=period[:-1]*12)
+
+        file_df = files.read_parquet(root_dir=root_dir, tickers=tickers, start=start, end=end, engine="pyarrow")
+        current_df = self.get_historical_prices(tickers=tickers, start=start, end=end, interval="1m")
+
+        if not file_df.equals(current_df):
+            files.to_parquet(current_df, root_dir=root_dir)

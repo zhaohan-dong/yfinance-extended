@@ -9,16 +9,21 @@
 from setuptools import setup, find_packages
 
 # --- get version ---
-version = "unknown"
 with open("yfinance-extended/version.py") as f:
     line = f.read().strip()
     version = line.replace("version = ", "").replace('"', '')
 # --- /get version ---
 
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
+
 setup(
     name='yfinance',
     version=version,
     description='Extension of yfinance package to download wide-form stock data from Yahoo! Finance',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/zhaohan-dong/yfinance-extended',
     author='Zhaohan Dong',
     author_email='zhaohan_dong@yahoo.com',

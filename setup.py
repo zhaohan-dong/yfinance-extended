@@ -29,7 +29,7 @@ setup(
     author_email='zhaohan_dong@yahoo.com',
     license='bsd-3-clause',
     classifiers=[
-        'License :: OSI Approved :: BSD',
+        'License :: OSI Approved :: BSD License',
         'Development Status :: 3 - Alpha',
         # 'Development Status :: 4 - Beta',
         # 'Development Status :: 5 - Production/Stable',

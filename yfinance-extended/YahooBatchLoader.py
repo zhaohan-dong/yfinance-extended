@@ -1,7 +1,6 @@
 # Wrapper class to download data from Yahoo Finance using yfinance package
 from typing import Any
 import pytz
-import yfinance
 import yfinance as yf
 import pandas as pd
 import datetime

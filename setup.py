@@ -6,7 +6,7 @@
 
 """yfinance-extended"""
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 # --- get version ---
 with open("yfinance-extended/version.py") as f:
@@ -19,7 +19,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
-    name='yfinance',
+    name='yfinance-extended',
     version=version,
     description='Extension of yfinance package to download wide-form stock data from Yahoo! Finance',
     long_description=long_description,

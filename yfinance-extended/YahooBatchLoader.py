@@ -105,11 +105,11 @@ class YahooBatchLoader:
         if start == None and end == None:
             end = datetime.date.today()
             if period in ["1d", "5d"]:
-                start = end - datetime.timedelta(days=period[:-1])
+                start = end - datetime.timedelta(days=int(period[:-1]))
             elif period in ["1mo", "3mo", "6mo"]:
-                start = end - datetime.timedelta(months=period[:-1])
+                start = end - datetime.timedelta(weeks=int(period[:-1])*4)
             elif period in ["1y", "2y", "5y", "10y"]:
-                start = end - datetime.timedelta(months=period[:-1]*12)
+                start = end - datetime.timedelta(weeks=int(period[:-1])*52)
 
         file_df = files.read_parquet(root_dir=root_dir, tickers=tickers, start=start, end=end, engine="pyarrow")
         current_df = self.get_historical_prices(tickers=tickers, start=start, end=end, interval="1m")

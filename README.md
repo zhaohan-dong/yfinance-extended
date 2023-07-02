@@ -1,4 +1,5 @@
 # yfinance Package with Wide-Form Data Support and Data Export
+**Note: currently being refactored to use Spark DataFrame instead of pandas to perform transformations.**
 
 `yfinance-extended` extends `yfinance` package by Ran Aroussi and make it easier to:
 1. Retrieve multiple-ticker intraday price data in a wide-form `pandas` dataframe;

@@ -1,4 +1,5 @@
 import pandas as pd
+import pyspark
 def rename_index_datetime(df: pd.DataFrame) -> pd.DataFrame:
     """
     The returned index is named "Datetime" when period is shorter than 1d, but "Date" when longer
@@ -25,3 +26,16 @@ def pivot_price_df_by_ticker(df: pd.DataFrame, tickers: list[str]) -> pd.DataFra
         df = df.reset_index()
         df.insert(loc=1, column="Ticker", value=tickers[0])
     return df
+
+# TODO: Create Spark DataFrame functions
+def spark_rename_index_datetime(df: pyspark.sql.DataFrame) -> pyspark.sql.DataFrame:
+    """
+    The returned index is named "Datetime" when period is shorter than 1d, but "Date" when longer
+    We'll format it to "Datetime"
+    :return: Pandas dataframe
+    """
+    if df.index.name == "Date":
+        df.index.rename("Datetime", inplace=True)
+    return df
+def spark_pivot_price_df_by_ticker(df: pyspark.sql.DataFrame, tickers: list[str]) -> pyspark.sql.DataFrame:
+   pass

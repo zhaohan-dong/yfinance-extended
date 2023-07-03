@@ -14,7 +14,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='yfinance-extended',
-    version="0.0.3",
+    version="0.1.0",
     description='Extension of yfinance package to download wide-form stock data from Yahoo! Finance',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -44,5 +44,5 @@ setup(
         'Programming Language :: Python :: 3.11'
     ],
     platforms=['any'],
-    install_requires=['yfinance>=0.2.18', 'pyarrow>=12.0.0']
+    install_requires=['yfinance>=0.2.18', 'pyarrow>=12.0.0', 'pyspark>=3.4.1']
 )

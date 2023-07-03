@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import datetime
 
+## TODO: Change to use pyspark to save parquet files
 def to_parquet(df: pd.DataFrame, root_dir: str, filepath: str=None, engine: str = "pyarrow", compression: str = "gzip") -> None:
     """
     Save dataframe to parquet files
@@ -25,6 +26,7 @@ def to_parquet(df: pd.DataFrame, root_dir: str, filepath: str=None, engine: str 
     else:
         df.to_parquet(path=filepath, engine=engine, compression=compression)
 
+## TODO: Change to use pyspark to read parquet files
 def read_parquet(root_dir: str=None, filepath: str=None, tickers: str|list[str]=None, start: str=None, end: str=None, engine: str="pyarrow") -> pd.DataFrame:
     """
     Read price data from parquet and load into a pandas dataframe

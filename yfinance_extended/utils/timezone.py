@@ -1,6 +1,9 @@
 import datetime
+
+import pyspark
 import pytz
 import pandas as pd
+
 
 def get_exchange_tz(timezone: str) -> datetime.tzinfo:
     """
@@ -41,3 +44,12 @@ def market_open_close(df: pd.DataFrame, exchangeTimeZoneName: str) -> pd.DataFra
         df["Market"] = None
         return df
     return df
+
+
+# TODO: Create spark dataframe functions
+def spark_df_to_exchange_tz(df: pyspark.sql.DataFrame, exchangeTimeZoneName: str) -> pyspark.sql.DataFrame:
+    pass
+
+
+def spark_market_open_close(df: pyspark.sql.DataFrame, exchangeTimeZoneName: str) -> pyspark.sql.DataFrame:
+    pass

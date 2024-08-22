@@ -1,19 +1,12 @@
-# Wrapper class to download data from Yahoo Finance using yfinance package
-from typing import Any
 import pytz
 import yfinance as yf
-import pandas as pd
 import datetime
+from typing import Any, Dict, List
+import pandas as pd
+from .models import LiveOptionsQuote, LiveQuote, StockSymbols
 from . import utils
-from . import quote
-from . import files
 
-
-class YahooBatchLoader:
-    def __repr__(self):
-        return 'yahoo_finance_data.YahooBatchLoader object'
-
-    def get_historical_prices(self, tickers: yf.Ticker | yf.Tickers | str | list[str],
+def get_historical_quote(stockSymbols: StockSymbols,
                    start: Any = None,
                    end: Any = None,
                    period: str = "5d",
@@ -33,7 +26,7 @@ class YahooBatchLoader:
         :param keepna: Keep NA entries
         :return: A pandas dataframe of prices
         """
-        tkrs = utils.parse_ticker_to_str_list(tickers)
+        tkrs = stockSymbols.symbols
 
         # Download ticker data from yahoo
         df = yf.download(tickers=tkrs,
@@ -45,38 +38,53 @@ class YahooBatchLoader:
                          actions=True,
                          progress=False,
                          group_by="ticker",
+                         threads=True,
                          keepna=keepna)
 
-        df = utils.rename_index_datetime(df)
-
-        df = utils.pivot_price_df_by_ticker(df, tkrs)
-
-        df = utils.market_open_close(df, exchangeTimeZoneName="America/New_York")
-
+        df = utils.yf_price_df.rename_datetime_column(df)
+        df = utils.yf_price_df.flatten_by_symbol(df, tkrs[0]) # Use first symbol as default symbol, if only one ticker is present the list
+        df = utils.yf_price_df.add_market_open_close_col(df, exchangeTimeZoneName="America/New_York")
         return df
 
-    def get_prices(self, tickers: yf.Ticker | yf.Tickers | str | list[str]) -> pd.DataFrame:
+def get_live_quote(stockSymbols: StockSymbols) -> pd.DataFrame:
+    """
+    Given a StockSymbols, return last quote
+    :param stockSymbols: StockSymbols
+    :return: Regular market price, post market bid price, ask price, bid size, ask size, quote access datetime
+    """
 
-        tkrs = utils.parse_ticker_to_str_list(tickers)
-        tickers_df = pd.DataFrame()
+    symbols = stockSymbols.symbols
+    symbols_df = pd.DataFrame(columns=LiveQuote.model_fields)
 
-        for ticker in tkrs:
-            ticker_df = pd.DataFrame([quote.get_quote(ticker)])
-            tickers_df = pd.concat([tickers_df, ticker_df])
+    for symbol in symbols:
+        stock = yf.Ticker(symbol)
+        info = stock.info
+        try:
+            quote: LiveQuote = LiveQuote(
+                 symbol=symbol,
+                 bid=info["bid"],
+                 ask=info["ask"],
+                 bidSize=info["bidSize"],
+                 askSize=info["askSize"],
+                 accessTime=datetime.datetime.now(tz=datetime.timezone.utc)
+            )
+            symbol_df = pd.DataFrame([quote.model_dump()])
+            symbols_df = pd.concat([symbols_df, symbol_df])
+        except KeyError:
+            pass # Add logging etc
+    return symbols_df
 
-        return tickers_df
+def get_institutional_holdings() -> pd.DataFrame:
+     pass
 
-    # Get options data for all available future dates at the moment
-    def options_data(self, tickers: yf.Ticker | yf.Tickers | str | list[str]) -> pd.DataFrame:
+def get_live_options(symbols: StockSymbols) -> pd.DataFrame:
 
-        tkrs = utils.parse_ticker_to_str_list(tickers)
-
+        tkrs = symbols.symbols
         options_df = pd.DataFrame()  # create an empty DataFrame to store options data
 
         for ticker in tkrs:
 
-            ticker_options_df = pd.DataFrame()
-
+            ticker_options_df = pd.DataFrame(columns=LiveOptionsQuote.model_fields)
             # Get a list of expiration dates
             expiration_dates = yf.Ticker(ticker).options
 
@@ -89,30 +97,6 @@ class YahooBatchLoader:
                 ticker_options_df = pd.concat(
                     [ticker_options_df, call_options, put_options])  # concatenate call and put options data
                 ticker_options_df["accessTime"] = datetime.datetime.now(tz=pytz.UTC)
-                ticker_options_df["ticker"] = ticker
-
+                ticker_options_df["symbol"] = ticker
             options_df = pd.concat([options_df, ticker_options_df])
-
         return options_df
-
-    def update_data(self, tickers: yf.Ticker | yf.Tickers | str | list[str],
-                    root_dir: str,
-                    start: Any = None,
-                    end: Any = None,
-                    period: str = "5d"):
-
-        # Get period into start/end dates
-        if start == None and end == None:
-            end = datetime.date.today()
-            if period in ["1d", "5d"]:
-                start = end - datetime.timedelta(days=int(period[:-1]))
-            elif period in ["1mo", "3mo", "6mo"]:
-                start = end - datetime.timedelta(weeks=int(period[:-1])*4)
-            elif period in ["1y", "2y", "5y", "10y"]:
-                start = end - datetime.timedelta(weeks=int(period[:-1])*52)
-
-        file_df = files.read_parquet(root_dir=root_dir, tickers=tickers, start=start, end=end, engine="pyarrow")
-        current_df = self.get_historical_prices(tickers=tickers, start=start, end=end, interval="1m")
-
-        if not file_df.equals(current_df):
-            files.to_parquet(current_df, root_dir=root_dir)

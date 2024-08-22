@@ -13,7 +13,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
-    name='yfinance-extended',
+    name='yfinance_extended',
     version="0.0.3",
     description='Extension of yfinance package to download wide-form stock data from Yahoo! Finance',
     long_description=long_description,
@@ -44,5 +44,5 @@ setup(
         'Programming Language :: Python :: 3.11'
     ],
     platforms=['any'],
-    install_requires=['yfinance>=0.2.18', 'pyarrow>=12.0.0']
+    install_requires=['yfinance>=0.2.18', 'pyarrow>=12.0.0', 'pydantic>=2.8.2']
 )

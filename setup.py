@@ -14,7 +14,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='yfinance_extended',
-    version="0.1.0",
+    version="0.1.1",
     description='Extension of yfinance package to download wide-form stock data from Yahoo! Finance',
     long_description=long_description,
     long_description_content_type='text/markdown',
